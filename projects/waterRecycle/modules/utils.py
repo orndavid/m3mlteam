@@ -5,7 +5,8 @@ through the entire package
 import random
 import pandas as pd
 import numpy as np
-from tqdm import tqdm
+from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler
+from scipy import stats
 
 
 def verify_name_in_series(df, y_name):
@@ -27,3 +28,20 @@ def rand_int_range():
     """
     return random.randint(0, 9999999)
 
+
+def _cnorm(series):
+    """Normalize a dataframe using the linear scaling"""
+    return (series - np.min(series)) / (np.max(series) - np.min(series))
+
+
+def normalize(method, df):
+    """Normalize a dataframe using a specific method"""
+    columns = df.columns
+    if method == "range":
+        return pd.DataFrame(data=MinMaxScaler().fit(df).transform(df),
+                            columns=columns)
+    elif method == "z":
+        return stats.zscore(df)
+    elif method == "maxabs":
+        return pd.DataFrame(data=MaxAbsScaler().fit(df).transform(df),
+                            columns=columns)
